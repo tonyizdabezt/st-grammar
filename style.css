@@ -3,6 +3,11 @@
     display: none;
 }
 
+.grammar_settings small {
+    display: block;
+    margin-bottom: 10px;
+}
+
 .grammar_block {
     margin-top: 6px;
     font-size: 0.85em;
