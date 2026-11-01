@@ -8,8 +8,18 @@
     margin-bottom: 10px;
 }
 
+/* themes space the end of .mes_text differently, so the block owns both gaps */
+#chat .mes_text:has(+ .grammar_block) {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+#chat .mes_text:has(+ .grammar_block) > :last-child {
+    margin-bottom: 0 !important;
+}
+
 .grammar_block {
-    margin-top: 6px;
+    margin: 12px 0;
     font-size: 0.85em;
     line-height: 1.4;
 }
