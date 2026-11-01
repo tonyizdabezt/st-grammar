@@ -6,7 +6,7 @@ A SillyTavern extension for non-native English speakers. It proofreads each mess
 
 - Your reply isn't delayed: the check runs in the background.
 - The spell-check icon in a message's three-dots menu checks that message on demand.
-- Corrections never go into your message, so the AI doesn't see them.
+- Corrections stay out of your message unless you click **Apply fixes** under them. Applied fixes get a ✓, and the AI sees them from its next reply on. A fix is left as ✗ if its words appear more than once, overlap another fix, or are in dialogue while **Improve dialogues** is off.
 - Only your message is sent to the model, not the chat history. Dialogue in double quotes is left out too, unless **Improve dialogues** is on.
 - Results are saved with the chat. Editing a message removes its old result and, with **Run automatically** on, checks it again.
 - Slang, a character's voice, deliberate fragments and `*action*` formatting are left alone.

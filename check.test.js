@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { buildPrompt, hideDialogues, parseCheck, worthChecking } from './check.js';
+import { applyFixes, buildPrompt, hideDialogues, parseCheck, worthChecking } from './check.js';
 
 const TEXT = '*She walk to the door.* "I am agree."';
 const REPLY = JSON.stringify({
@@ -96,4 +96,38 @@ test('the prompt follows the settings', () => {
     assert.doesNotMatch(prompt('all', false), /native speaker would say it\. Keep its meaning/);
     assert.match(prompt('all', true), /native speaker would say it\. Keep its meaning/);
     assert.doesNotMatch(prompt('all', true), /dialogue that was removed/);
+});
+
+const fix = (from, to) => ({ from, to, why: '' });
+const appliedFroms = fixes => fixes.filter(item => item.applied).map(item => item.from);
+
+test('applies every fix to the words it names', () => {
+    const { text, fixes } = applyFixes('He go to store', [fix('to store', 'to the store'), fix('He go', 'He goes')], false);
+    assert.equal(text, 'He goes to the store');
+    assert.deepEqual(appliedFroms(fixes), ['to store', 'He go']);
+});
+
+test('a fix is not reapplied to the text another fix wrote', () => {
+    const { text } = applyFixes('cat sat', [fix('cat', 'sat cat'), fix('sat', 'sits')], false);
+    assert.equal(text, 'sat cat sits');
+});
+
+test('leaves a fix alone when its words appear twice', () => {
+    const { text, fixes } = applyFixes('is he is here', [fix('is', 'was'), fix('here', 'there')], false);
+    assert.equal(text, 'is he is there');
+    assert.deepEqual(appliedFroms(fixes), ['here']);
+});
+
+test('leaves the later of two overlapping fixes alone', () => {
+    const { text, fixes } = applyFixes('he go home', [fix('he go', 'he goes'), fix('go home', 'went home')], false);
+    assert.equal(text, 'he goes home');
+    assert.deepEqual(appliedFroms(fixes), ['he go']);
+});
+
+test('dialogue stays untouched while it is protected', () => {
+    const message = 'He go "He go" now';
+    assert.equal(applyFixes(message, [fix('He go', 'He goes')], true).text, 'He goes "He go" now');
+    assert.equal(applyFixes(message, [fix('He go', 'He goes')], false).text, message);
+    assert.equal(applyFixes('"He go" now', [fix('He go', 'He goes')], true).text, '"He go" now');
+    assert.equal(applyFixes('"He go" now', [fix('He go', 'He goes')], false).text, '"He goes" now');
 });

@@ -46,11 +46,13 @@
     opacity: 0.7;
 }
 
-.grammar_natural {
+.grammar_natural,
+.grammar_apply {
     margin-top: 2px;
 }
 
-.grammar_failed {
+.grammar_failed,
+.grammar_apply {
     display: block;
     padding: 0;
     border: 0;

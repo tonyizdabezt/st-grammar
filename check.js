@@ -32,6 +32,28 @@ const isText = value => typeof value === 'string' && value.trim() !== '';
 
 export const hideDialogues = text => text.replace(DIALOGUE, OMITTED);
 
+// a fix whose words appear more than once could land on the wrong one so it stays unapplied
+export function applyFixes(text, fixes, keepDialogues) {
+    const searchable = keepDialogues ? text.replace(DIALOGUE, quote => '\0'.repeat(quote.length)) : text;
+    const spots = fixes
+        .map(fix => ({ fix, at: searchable.indexOf(fix.from) }))
+        .filter(({ fix, at }) => at >= 0 && at === searchable.lastIndexOf(fix.from))
+        .sort((a, b) => a.at - b.at);
+    const applied = new Set();
+    let fixed = '';
+    let end = 0;
+    for (const { fix, at } of spots) {
+        if (at < end) continue;
+        fixed += text.slice(end, at) + fix.to;
+        end = at + fix.from.length;
+        applied.add(fix);
+    }
+    return {
+        text: fixed + text.slice(end),
+        fixes: fixes.map(fix => (applied.has(fix) ? { ...fix, applied: true } : fix)),
+    };
+}
+
 export function worthChecking(text, minWords) {
     const words = text.replaceAll(OMITTED, ' ').match(/\S+/g)?.length ?? 0;
     return text.length <= MAX_CHARS && words >= minWords;

@@ -1,5 +1,5 @@
 import { secret_state, SECRET_KEYS } from '../../../secrets.js';
-import { buildPrompt, hideDialogues, parseCheck, worthChecking } from './check.js';
+import { applyFixes, buildPrompt, hideDialogues, parseCheck, worthChecking } from './check.js';
 
 const MODULE = 'grammar';
 const MAX_TOKENS = 4096;
@@ -42,9 +42,9 @@ async function request(text) {
     return result?.content;
 }
 
-function renderFix({ from, to, why }) {
+function renderFix({ from, to, why, applied }) {
     const row = $('<div class="grammar_fix">').append(
-        '<span class="grammar_mark" aria-hidden="true">✗</span> ',
+        applied ? '<span class="grammar_clean" aria-hidden="true">✓</span> ' : '<span class="grammar_mark" aria-hidden="true">✗</span> ',
         $('<s class="grammar_from">').text(from),
         ' → ',
         $('<b class="grammar_to">').text(to),
@@ -60,6 +60,7 @@ function renderResult(result) {
     }
     const block = $('<div class="grammar_block">').append(result.fixes.map(renderFix));
     if (result.natural) block.append($('<div class="grammar_natural">').text(`Natural: ${result.natural}`));
+    if (result.fixes.length && !result.fixes.some(fix => fix.applied)) block.append('<button type="button" class="grammar_apply">Apply fixes</button>');
     return block;
 }
 
@@ -117,6 +118,28 @@ async function check(message, manual = false) {
     } finally {
         if (checking.get(message) === text) checking.delete(message);
     }
+}
+
+function apply(message) {
+    const result = message?.extra?.grammar;
+    if (!result?.fixes || message.mes !== result.text) return;
+    const id = ctx().chat.indexOf(message);
+    // redrawing .mes_text would wipe out an open edit box
+    if ($(`#chat .mes[mesid="${id}"] .edit_textarea`).length) {
+        toastr.info('Finish editing the message first.', 'Grammar');
+        return;
+    }
+    const { text, fixes } = applyFixes(result.text, result.fixes, !settings.improveDialogues);
+    const skipped = fixes.filter(fix => !fix.applied).length;
+    if (skipped) toastr.warning(`Not applied: ${skipped}. Their words appear more than once, overlap another fix, or are in dialogue.`, 'Grammar');
+    if (text === message.mes) return;
+    message.mes = text;
+    result.text = text;
+    result.fixes = fixes;
+    ctx().updateMessageBlock(id, message);
+    draw(message);
+    ctx().saveChat();
+    ctx().eventSource.emit(ctx().eventTypes.MESSAGE_UPDATED, id);
 }
 
 function createSettingsUI() {
@@ -196,6 +219,9 @@ jQuery(() => {
     $('#message_template .mes_buttons .extraMesButtons').prepend('<div title="Check grammar" class="mes_button grammar_check fa-solid fa-spell-check"></div>');
     $('#chat').on('click', '.grammar_check', function () {
         check(ctx().chat[Number($(this).closest('.mes').attr('mesid'))], true);
+    });
+    $('#chat').on('click', '.grammar_apply', function () {
+        apply(ctx().chat[Number($(this).closest('.mes').attr('mesid'))]);
     });
 
     const { eventSource, eventTypes } = ctx();
