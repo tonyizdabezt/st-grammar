@@ -6,7 +6,7 @@
     "js": "index.js",
     "css": "style.css",
     "author": "tonyizdabezt",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "homePage": "https://github.com/tonyizdabezt/st-grammar",
     "description": "Proofreads the English in your messages and shows corrections under them."
 }
