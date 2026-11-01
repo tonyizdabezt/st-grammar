@@ -1,0 +1,47 @@
+.mes:not([is_user="true"]) .grammar_check,
+.mes[is_system="true"] .grammar_check {
+    display: none;
+}
+
+.grammar_block {
+    margin-top: 6px;
+    font-size: 0.85em;
+    line-height: 1.4;
+}
+
+.grammar_from {
+    color: #e06c75;
+}
+
+.grammar_mark {
+    color: #e06c75;
+}
+
+.grammar_to {
+    color: #98c379;
+}
+
+.grammar_clean {
+    color: #98c379;
+}
+
+.grammar_why,
+.grammar_natural,
+.grammar_pending {
+    opacity: 0.7;
+}
+
+.grammar_natural {
+    margin-top: 2px;
+}
+
+.grammar_failed {
+    display: block;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+    opacity: 0.7;
+}
