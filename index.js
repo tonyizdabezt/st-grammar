@@ -129,7 +129,7 @@ function createSettingsUI() {
                 </div>
                 <div class="inline-drawer-content">
                     <label class="checkbox_label"><input id="grammar_auto_check" type="checkbox"> Run automatically</label>
-                    <small>Checks each message when you send or edit it. The spell-check icon on your messages always works.</small>
+                    <small>Checks each message when you send or edit it. The spell-check icon in a message's three-dots menu always works.</small>
                     <label for="grammar_profile">Connection profile</label>
                     <select id="grammar_profile" class="text_pole"></select>
                     <label for="grammar_model">Model</label>
@@ -193,7 +193,7 @@ jQuery(() => {
     loadSettings();
     createSettingsUI();
 
-    $('#message_template .mes_buttons .mes_edit').before('<div title="Check grammar" class="mes_button grammar_check fa-solid fa-spell-check"></div>');
+    $('#message_template .mes_buttons .extraMesButtons').prepend('<div title="Check grammar" class="mes_button grammar_check fa-solid fa-spell-check"></div>');
     $('#chat').on('click', '.grammar_check', function () {
         check(ctx().chat[Number($(this).closest('.mes').attr('mesid'))], true);
     });
