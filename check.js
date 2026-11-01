@@ -18,7 +18,7 @@ Reply with JSON only:
 {"english": true, "fixes": [{"from": "...", "to": "...", "why": "..."}], "natural": null}
 
 - "from" MUST be copied character for character from the message, as short as the fix allows.
-- "why" is a short reason in simple English, like "missing article" or "incomplete sentence".
+- "why" MUST only name the error type in at most 5 simple words, like "wrong verb form", "wrong tense and preposition", or "missing article before noun". Never add an explanation.
 - "english" is false when the message is mostly not English, and "fixes" is then empty.
 - "natural" is how a native speaker would say it. Keep it null unless a sentence is still clearly unnatural after the fixes.`;
 
